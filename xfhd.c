@@ -54,11 +54,7 @@ static char *ProgramName;
 #define FULLHD_X 1920
 #define FULLHD_Y 1080
 
-static int parse_button ( char *s, int *buttonp );
 static XID get_window_id ( Display *dpy, int screen, int button, const char *msg );
-static int catch_window_errors ( Display *dpy, XErrorEvent *ev );
-static int kill_all_windows ( Display *dpy, int screenno, Bool top );
-static int verify_okay_to_kill ( Display *dpy, int screenno );
 static Bool wm_state_set ( Display *dpy, Window win );
 static Bool wm_running ( Display *dpy, int screenno );
 
@@ -75,7 +71,7 @@ static void _X_NORETURN usage(void) {
 	const char *options =
 "where options include:\n"
 "    -display displayname    X server to contact\n"
-"    -id resource            resource whose client is to be killed\n"
+"    -id resource            resource whose client is to be resized\n"
 "    -version                print version and exit\n"
 "\n";
 
@@ -89,11 +85,9 @@ int main(int argc, char *argv[]) {
 	Display *dpy = NULL;
 	char *displayname = NULL;		/* name of server to contact */
 	int screenno;			/* screen number of dpy */
-	XID id = None;			/* resource to kill */
+	XID id = None;			/* resource to resize */
 	char *button_name = NULL;		/* name of button for window select */
 	int button;				/* button number or negative for all */
-	Bool kill_all = False;
-	Bool top = False;
 
 	ProgramName = argv[0];
 	button = SelectButtonFirst;
@@ -135,24 +129,12 @@ int main(int argc, char *argv[]) {
 	}
 	screenno = DefaultScreen(dpy);
 
-	if (kill_all) {
-		if (verify_okay_to_kill (dpy, screenno))
-			kill_all_windows (dpy, screenno, top);
-		Exit (0, dpy);
-	}
-
 	/*
 	 * if no id was given, we need to choose a window
 	 */
 	if (id == None) {
 		if (!button_name)
 			button_name = XGetDefault(dpy, ProgramName, "Button");
-
-		if (button_name && !parse_button(button_name, &button)) {
-			fprintf (stderr, "%s:  invalid button specification \"%s\"\n",
-				 ProgramName, button_name);
-			Exit (1, dpy);
-		}
 
 		if (button >= 0 || button == SelectButtonFirst) {
 			unsigned char pointer_map[256];	 /* 8 bits of pointer num */
@@ -186,11 +168,11 @@ int main(int argc, char *argv[]) {
 					"the window whose client you wish to resize"))) {
 			if (id == RootWindow(dpy,screenno))
 				id = None;
-			else if (!top) {
+			else {
 				XID indicated = id;
 				if ((id = XmuClientWindow(dpy, indicated)) == indicated) {
-					/* Try not to kill the window manager when the user
-					 * indicates an icon to xkill.
+					/* Try not to resize the window manager when the user
+					 * indicates an icon to xfhd.
 					 */
 					if (! wm_state_set(dpy, id) && wm_running(dpy, screenno))
 						id = None;
@@ -219,36 +201,6 @@ int main(int argc, char *argv[]) {
 	Exit (0, dpy);
 	/*NOTREACHED*/
 	return 0;
-}
-
-
-static int parse_button(char *s, int *buttonp) {
-	register char *cp;
-
-	/* lower case name */
-	for (cp = s; *cp; cp++) {
-		if (isascii (*cp) && isupper (*cp)) {
-			#ifdef _tolower
-				*cp = (char) _tolower (*cp);
-			#else
-				*cp = (char) tolower (*cp);
-			#endif /* _tolower */
-		}
-	}
-
-	if (strcmp (s, "any") == 0) {
-		*buttonp = SelectButtonAny;
-		return (1);
-	}
-
-	/* check for non-numeric input */
-	for (cp = s; *cp; cp++) {
-		if (!(isascii (*cp) && isdigit (*cp)))
-			return (0);  /* bogus name */
-	}
-
-	*buttonp = atoi (s);
-	return (1);
 }
 
 
@@ -308,77 +260,6 @@ static XID get_window_id(Display *dpy, int screen, int button, const char *msg) 
 	XSync (dpy, 0);
 
 	return ((button == -1 || retbutton == button) ? retwin : None);
-}
-
-
-static int catch_window_errors(_X_UNUSED Display *dpy, _X_UNUSED XErrorEvent *ev) {
-	return 0;
-}
-
-
-static int kill_all_windows(Display *dpy, int screenno, Bool top) {
-	Window root = RootWindow (dpy, screenno);
-	Window dummywindow;
-	Window *children;
-	unsigned int nchildren;
-	unsigned int i;
-	XWindowAttributes attr;
-
-	XSync (dpy, 0);
-	XSetErrorHandler (catch_window_errors);
-
-	nchildren = 0;
-	XQueryTree (dpy, root, &dummywindow, &dummywindow, &children, &nchildren);
-	if (!top) {
-		for (i = 0; i < nchildren; i++) {
-			if (XGetWindowAttributes(dpy, children[i], &attr) &&
-			(attr.map_state == IsViewable))
-			children[i] = XmuClientWindow(dpy, children[i]);
-			else
-			children[i] = 0;
-		}
-	}
-	for (i = 0; i < nchildren; i++) {
-		if (children[i])
-			XKillClient (dpy, children[i]);
-	}
-	XFree ((char *)children);
-
-	XSync (dpy, 0);
-	XSetErrorHandler (NULL);		/* pretty stupid way to do things... */
-
-	return 0;
-}
-
-
-/*
- * ask the user to press in the root with each button in succession
- */
-static int verify_okay_to_kill(Display *dpy, int screenno) {
-	unsigned char pointer_map[256];
-	int count = XGetPointerMapping (dpy, pointer_map, 256);
-	int i;
-	int button;
-	const char *msg = "the root window";
-	Window root = RootWindow (dpy, screenno);
-	int okay = 0;
-
-	for (i = 0; i < count; i++) {
-		button = (int) pointer_map[i];
-		if (button == 0)
-			continue;	/* disabled */
-		if (get_window_id (dpy, screenno, button, msg) != root) {
-			okay = 0;
-			break;
-		}
-		okay++;				/* must have at least one button */
-	}
-	if (okay) {
-		return 1;
-	} else {
-		printf ("Aborting.\n");
-		return 0;
-	}
 }
 
 
