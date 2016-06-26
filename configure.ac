@@ -23,8 +23,7 @@ dnl Process this file with autoconf to create configure.
 
 # Initialize Autoconf
 AC_PREREQ([2.60])
-AC_INIT([xfhd], [1.0.4],
-        [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], [xfhd])
+AC_INIT([xfhd], [1])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS([config.h])
 
@@ -42,6 +41,6 @@ XORG_DEFAULT_OPTIONS
 PKG_CHECK_MODULES(XFHD, [x11 xmuu xproto >= 7.0.22])
 
 AC_CONFIG_FILES([
-	Makefile
-	man/Makefile])
+	Makefile])
 AC_OUTPUT
+
