@@ -1,4 +1,4 @@
-xkill is a utility for forcing the X server to close connections to
+xfhd is a utility for forcing the X server to close connections to
 clients.  This program is very dangerous, but is useful for aborting
 programs that have displayed undesired windows on a user's screen.
 
@@ -13,9 +13,9 @@ Please submit bug reports to the Xorg bugzilla:
 
 The master development code repository can be found at:
 
-        git://anongit.freedesktop.org/git/xorg/app/xkill
+        git://anongit.freedesktop.org/git/xorg/app/xfhd
 
-        http://cgit.freedesktop.org/xorg/app/xkill
+        http://cgit.freedesktop.org/xorg/app/xfhd
 
 For patch submission instructions, see:
 

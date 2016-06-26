@@ -99,7 +99,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = xkill$(EXEEXT)
+bin_PROGRAMS = xfhd$(EXEEXT)
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
@@ -117,10 +117,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_xkill_OBJECTS = xkill.$(OBJEXT)
-xkill_OBJECTS = $(am_xkill_OBJECTS)
+am_xfhd_OBJECTS = xfhd.$(OBJEXT)
+xfhd_OBJECTS = $(am_xfhd_OBJECTS)
 am__DEPENDENCIES_1 =
-xkill_DEPENDENCIES = $(am__DEPENDENCIES_1)
+xfhd_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -149,8 +149,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(xkill_SOURCES)
-DIST_SOURCES = $(xkill_SOURCES)
+SOURCES = $(xfhd_SOURCES)
+DIST_SOURCES = $(xfhd_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -302,8 +302,8 @@ SHELL = @SHELL@
 STRICT_CFLAGS = @STRICT_CFLAGS@
 STRIP = @STRIP@
 VERSION = @VERSION@
-XKILL_CFLAGS = @XKILL_CFLAGS@
-XKILL_LIBS = @XKILL_LIBS@
+XFHD_CFLAGS = @XFHD_CFLAGS@
+XFHD_LIBS = @XFHD_LIBS@
 XORG_MAN_PAGE = @XORG_MAN_PAGE@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -356,10 +356,10 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = man
-AM_CFLAGS = $(CWARNFLAGS) $(XKILL_CFLAGS)
-xkill_LDADD = $(XKILL_LIBS)
-xkill_SOURCES = \
-        xkill.c
+AM_CFLAGS = $(CWARNFLAGS) $(XFHD_CFLAGS)
+xfhd_LDADD = $(XFHD_LIBS)
+xfhd_SOURCES = \
+        xfhd.c
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 all: config.h
@@ -459,9 +459,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-xkill$(EXEEXT): $(xkill_OBJECTS) $(xkill_DEPENDENCIES) $(EXTRA_xkill_DEPENDENCIES) 
-	@rm -f xkill$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(xkill_OBJECTS) $(xkill_LDADD) $(LIBS)
+xfhd$(EXEEXT): $(xfhd_OBJECTS) $(xfhd_DEPENDENCIES) $(EXTRA_xfhd_DEPENDENCIES)
+	@rm -f xfhd$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(xfhd_OBJECTS) $(xfhd_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -469,7 +469,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xkill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xfhd.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

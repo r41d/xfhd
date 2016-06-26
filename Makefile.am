@@ -20,13 +20,13 @@
 #  PERFORMANCE OF THIS SOFTWARE.
 
 SUBDIRS = man
-bin_PROGRAMS = xkill
+bin_PROGRAMS = xfhd
 
-AM_CFLAGS = $(CWARNFLAGS) $(XKILL_CFLAGS)
-xkill_LDADD = $(XKILL_LIBS)
+AM_CFLAGS = $(CWARNFLAGS) $(XFHD_CFLAGS)
+xfhd_LDADD = $(XFHD_LIBS)
 
-xkill_SOURCES =	\
-        xkill.c
+xfhd_SOURCES =	\
+        xfhd.c
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 
