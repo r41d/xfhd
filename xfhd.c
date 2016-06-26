@@ -51,8 +51,8 @@ static char *ProgramName;
 #define SelectButtonAny (-1)
 #define SelectButtonFirst (-2)
 
-#define FULLHD_X 1920
-#define FULLHD_Y 1080
+int RESOLUTION_X = 1920;
+int RESOLUTION_Y = 1080;
 
 static XID get_window_id ( Display *dpy, int screen, int button, const char *msg );
 static Bool wm_state_set ( Display *dpy, Window win );
@@ -72,6 +72,8 @@ static void _X_NORETURN usage(void) {
 "where options include:\n"
 "    -display displayname    X server to contact\n"
 "    -id resource            resource whose client is to be resized\n"
+"    -x                      specify alternative X resolution"
+"    -y                      specify alternative Y resolution"
 "    -version                print version and exit\n"
 "\n";
 
@@ -98,17 +100,25 @@ int main(int argc, char *argv[]) {
 		if (arg[0] == '-') {
 			switch (arg[1]) {
 			  case 'd':			/* -display displayname */
-				if (++i >= argc) usage ();
+				if (++i >= argc) usage();
 				displayname = argv[i];
 				continue;
 			  case 'i':			/* -id resourceid */
-				if (++i >= argc) usage ();
-				id = strtoul (argv[i], NULL, 0);
+				if (++i >= argc) usage();
+				id = strtoul(argv[i], NULL, 0);
 				if (id == 0 || id >= 0xFFFFFFFFU) {
 					fprintf (stderr, "%s:  invalid id \"%s\"\n",
 						 ProgramName, argv[i]);
 					Exit (1, dpy);
 				}
+				continue;
+			  case 'x':
+				if (++i >= argc) usage();
+				RESOLUTION_X = strtoul(argv[i], NULL, 0);
+				continue;
+			  case 'y':
+				if (++i >= argc) usage();
+				RESOLUTION_Y = strtoul(argv[i], NULL, 0);
 				continue;
 			  case 'v':
 				puts(PACKAGE_STRING);
@@ -193,7 +203,7 @@ int main(int argc, char *argv[]) {
 		//       Display *display;
 		//       Window w;
 		//       unsigned int width, height;
-		XResizeWindow(dpy, id, FULLHD_X, FULLHD_Y);
+		XResizeWindow(dpy, id, RESOLUTION_X, RESOLUTION_Y);
 
 		XSync (dpy, 0);
 	}
