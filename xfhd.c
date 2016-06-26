@@ -27,12 +27,8 @@ from The Open Group.
 */
 
 /*
- * xkill - simple program for destroying unwanted clients
+ * xfhd - simple program for resizing to Full HD
  * Author:  Jim Fulton, MIT X Consortium; Dana Chee, Bellcore
- */
-
-/*
- * Warning, this is a very dangerous client....
  */
 
 #ifdef HAVE_CONFIG_H
