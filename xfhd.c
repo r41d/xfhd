@@ -51,6 +51,9 @@ static char *ProgramName;
 #define SelectButtonAny (-1)
 #define SelectButtonFirst (-2)
 
+#define FULLHD_X 1920
+#define FULLHD_Y 1080
+
 static int parse_button ( char *s, int *buttonp );
 static XID get_window_id ( Display *dpy, int screen, int button, const char *msg );
 static int catch_window_errors ( Display *dpy, XErrorEvent *ev );
@@ -73,14 +76,10 @@ static void _X_NORETURN usage(void) {
 "where options include:\n"
 "    -display displayname    X server to contact\n"
 "    -id resource            resource whose client is to be killed\n"
-"    -frame                  don't ignore window manager frames\n"
-"    -button number          specific button to be pressed to select window\n"
-"    -all                    kill all clients with top level windows\n"
 "    -version                print version and exit\n"
 "\n";
 
-	fprintf (stderr, "usage:  %s [-option ...]\n%s",
-		 ProgramName, options);
+	fprintf (stderr, "usage:  %s [-option ...]\n%s", ProgramName, options);
 	Exit (1, NULL);
 }
 
@@ -117,16 +116,6 @@ int main(int argc, char *argv[]) {
 					Exit (1, dpy);
 				}
 				continue;
-			  case 'b':			/* -button number */
-				if (++i >= argc) usage ();
-				button_name = argv[i];
-				continue;
-			  case 'f':			/* -frame */
-				top = True;
-				continue;
-			  case 'a':			/* -all */
-				kill_all = True;
-				continue;
 			  case 'v':
 				puts(PACKAGE_STRING);
 				exit(0);
@@ -157,9 +146,9 @@ int main(int argc, char *argv[]) {
 	 */
 	if (id == None) {
 		if (!button_name)
-			button_name = XGetDefault (dpy, ProgramName, "Button");
+			button_name = XGetDefault(dpy, ProgramName, "Button");
 
-		if (button_name && !parse_button (button_name, &button)) {
+		if (button_name && !parse_button(button_name, &button)) {
 			fprintf (stderr, "%s:  invalid button specification \"%s\"\n",
 				 ProgramName, button_name);
 			Exit (1, dpy);
@@ -194,7 +183,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		if ((id = get_window_id (dpy, screenno, button,
-					"the window whose client you wish to kill"))) {
+					"the window whose client you wish to resize"))) {
 			if (id == RootWindow(dpy,screenno))
 				id = None;
 			else if (!top) {
@@ -211,10 +200,20 @@ int main(int argc, char *argv[]) {
 	}
 
 	if (id != None) {
-	printf ("%s:  killing creator of resource 0x%lx\n", ProgramName, id);
-	XSync (dpy, 0);			/* give xterm a chance */
-	XKillClient (dpy, id);
-	XSync (dpy, 0);
+		printf ("%s:  resizing creator of resource 0x%lx\n", ProgramName, id);
+		XSync (dpy, 0);			/* give xterm a chance */
+
+		// Don't kill
+		//XKillClient(dpy, id);
+
+		// But resize!
+		// XResizeWindow(display, w, width, height)
+		//       Display *display;
+		//       Window w;
+		//       unsigned int width, height;
+		XResizeWindow(dpy, id, FULLHD_X, FULLHD_Y);
+
+		XSync (dpy, 0);
 	}
 
 	Exit (0, dpy);
